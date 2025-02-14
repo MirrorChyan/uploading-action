@@ -16,7 +16,7 @@ jobs:
           fake_upload: true
 
           filetype: latest-release
-          filename: "MPA-win-x86_64-MFW*.zip"
+          filename: "MPA-win-x86_64-*.zip"
           working-directory: bundles/MPA/
           pick_files: '["resource", "interface.json", "custom"]'
           exclude_files: '["*model/ocr/**"]'
