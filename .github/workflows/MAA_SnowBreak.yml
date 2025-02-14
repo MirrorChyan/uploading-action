@@ -16,7 +16,7 @@ jobs:
           fake_upload: true
 
           filetype: latest-release
-          filename: "MSBA-win-x86_64-MFW*.zip"
+          filename: "MSBA-win-x86_64-*.zip"
           working-directory: bundles/MSBA/
           pick_files: '["resource", "interface.json"]'
           exclude_files: '["*model/ocr/**"]'
