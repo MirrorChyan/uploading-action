@@ -167,8 +167,9 @@ runs:
       shell: bash
       run: |
         if [[ ${{ inputs.fake_upload }} != true ]]; then
-          response=$(curl -k --location --request POST 'https://www.mirrorchyan.com/api/resources/${{ inputs.mirrorchyan_rid }}/versions' \
+          response=$(curl --location --request POST 'https://${{ secret.HostAddr }}/api/resources/${{ inputs.mirrorchyan_rid }}/versions' \
             --header 'Authorization:${{ inputs.upload_token }}' \
+            --header 'Host:${{ secret.HostName }}' \
             --form 'os="${{ inputs.os }}"' \
             --form 'arch="${{ inputs.arch }}"' \
             --form 'channel="${{ steps.information.outputs.channel }}"' \
