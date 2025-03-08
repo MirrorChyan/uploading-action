@@ -6,6 +6,8 @@ urllib3.disable_warnings()
 
 _, rid, version, os, arch, channel, token, file = sys.argv
 
+print('start upload')
+
 data = {
     "name": version,
     "os": os,
