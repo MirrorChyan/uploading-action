@@ -1,12 +1,13 @@
 import sys
 import urllib3
 import requests
+from datetime import datetime
 
 urllib3.disable_warnings()
 
 _, rid, version, os, arch, channel, token, file = sys.argv
 
-print('start upload')
+print(f"{datetime.now()} | start upload")
 
 data = {
     "name": version,
@@ -31,7 +32,7 @@ response_1 = requests.post(
     data=data,
     verify=False,
 )
-print(f"step 1: {response_1.status_code}")
+print(f"{datetime.now()} | step 1: {response_1.status_code}")
 
 if response_1.status_code != 200:
     print(f"step 1 failed: {response_1.status_code}, {response_1.text}")
@@ -54,7 +55,7 @@ response_2 = requests.post(
     verify=False,
 )
 
-print(f"step 2: {response_2.status_code}")
+print(f"{datetime.now()} | step 2: {response_2.status_code}")
 
 if response_2.status_code != 200:
     print(f"step 2 failed: {response_2.status_code}, {response_2.text}")
@@ -70,7 +71,7 @@ response_3 = requests.post(
     verify=False,
 )
 
-print(f"step 3: {response_3.status_code}")
+print(f"{datetime.now()} | step 3: {response_3.status_code}")
 
 if response_3.status_code != 200:
     print(f"step 3 failed: {response_3.status_code}, {response_3.text}")
