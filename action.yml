@@ -161,8 +161,7 @@ runs:
           python -m pip install requests
         fi
 
-        output=$(python mirrorchyan_uploading.py '${{ inputs.mirrorchyan_rid }}' '${{ steps.information.outputs.version_name }}' '${{ inputs.os }}' '${{ inputs.arch }}' '${{ steps.information.outputs.channel }}' '${{ inputs.upload_token }}' '${{ steps.information.outputs.filename }}')
-        echo "output=$output" | tee -a "$GITHUB_OUTPUT"
+        python mirrorchyan_uploading.py '${{ inputs.mirrorchyan_rid }}' '${{ steps.information.outputs.version_name }}' '${{ inputs.os }}' '${{ inputs.arch }}' '${{ steps.information.outputs.channel }}' '${{ inputs.upload_token }}' '${{ steps.information.outputs.filename }}'
 
     - name: Create issue if failed
       if: failure()
@@ -171,10 +170,6 @@ runs:
         actions: "create-issue"
         title: "Failed to upload to MirrorChyan for ${{ github.repository }}"
         body: |
-          ```json
-          ${{ steps.upload.outputs.output }}
-          ```
-
           ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
           @MistEO @Aliothmoon @dongwlin
