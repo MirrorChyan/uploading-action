@@ -161,7 +161,7 @@ runs:
           python -m pip install requests
         fi
 
-        output=$(python mirrorchyan_uploading.py "${{ inputs.mirrorchyan_rid }}" "${{ steps.information.outputs.version_name }}" "${{ inputs.os }}" "${{ inputs.arch }}" "${{ steps.information.outputs.channel }}" "${{ inputs.upload_token }}" "${{ steps.information.outputs.filename }}")
+        output=$(python mirrorchyan_uploading.py '${{ inputs.mirrorchyan_rid }}' '${{ steps.information.outputs.version_name }}' '${{ inputs.os }}' '${{ inputs.arch }}' '${{ steps.information.outputs.channel }}' '${{ inputs.upload_token }}' '${{ steps.information.outputs.filename }}')
         echo "output=$output" | tee -a "$GITHUB_OUTPUT"
 
     - name: Create issue if failed
