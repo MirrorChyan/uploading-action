@@ -1,4 +1,5 @@
 import sys
+import time
 import urllib3
 import requests
 from datetime import datetime
@@ -90,6 +91,7 @@ if __name__ == "__main__":
             break
         else:
             print(f"{datetime.now()} | retry {i + 1}")
+            time.sleep(10)
 
     if not done:
         print(f"{datetime.now()} | failed")
