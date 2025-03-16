@@ -1,4 +1,4 @@
-name: demo1-MFW
+name: demo1 for MFW-PyQt6 
 
 on:
   workflow_dispatch:
