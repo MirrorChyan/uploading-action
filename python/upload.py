@@ -85,13 +85,17 @@ def upload() -> bool:
 
 if __name__ == "__main__":
     done = False
-    for i in range(3):
+    retires = 3
+    for i in range(retires):
         if upload():
             done = True
             break
+        elif i == retires - 1:
+            break
         else:
-            print(f"{datetime.now()} | retry {i + 1}")
-            time.sleep(10)
+            sleep_time = 30
+            print(f"{datetime.now()} | retry {i + 1} after {sleep_time}s")
+            time.sleep(sleep_time)
 
     if not done:
         print(f"{datetime.now()} | failed")
