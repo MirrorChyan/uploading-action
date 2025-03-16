@@ -1,0 +1,32 @@
+name: demo1-MAA
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "action.yml"
+      - "python/**"
+      - ".github/workflows/demo1.yml"
+
+jobs:
+  mirrorchyan:
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        os: [win, linux, macos]
+        arch: [arm64, x64]
+    steps:
+      - id: uploading
+        uses: MirrorChyan/uploading-action@v1
+        with:
+          filetype: latest-release
+          fileName: "MFW*-win-x86_64-*.zip"
+          mirrorchyan_rid: demo1
+
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+          owner: overflow65537
+          repo: MFW-PyQt6
+          upload_token: ${{ secrets.MirrorChyanUploadTokenForDemo1 }}
+          os: ${{ matrix.os }}
+          arch: ${{ matrix.arch }}
