@@ -1,4 +1,4 @@
-name: demo1-MAA
+name: demo1-MFW
 
 on:
   workflow_dispatch:
