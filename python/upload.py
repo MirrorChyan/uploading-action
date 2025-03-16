@@ -82,6 +82,9 @@ def upload() -> bool:
         print(f"step 3 failed: {response_3.status_code}, {response_3.text}")
         return False
 
+    print(f"{datetime.now()} | uploaded")
+    return True
+
 
 if __name__ == "__main__":
     done = False
