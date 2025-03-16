@@ -54,18 +54,8 @@ inputs:
     default: "false"
 
 outputs:
-  error:
-    value: ${{ steps.upload.outputs.error }}
-  msg:
-    value: ${{ steps.upload.outputs.msg }}
-  version_id:
-    value: ${{ steps.upload.outputs.version_id }}
-  version_number:
-    value: ${{ steps.upload.outputs.version_number }}
-  version_name:
-    value: ${{ steps.upload.outputs.version_name }}
-  response:
-    value: ${{ steps.upload.outputs.response }}
+  output:
+    value: ${{ steps.upload.outputs.output }}
 
 runs:
   using: "composite"
@@ -170,7 +160,9 @@ runs:
           wget -O mirrorchyan_uploading.py https://raw.githubusercontent.com/MirrorChyan/uploading-action/refs/heads/v1/python/upload.py
           python -m pip install requests
         fi
-        python mirrorchyan_uploading.py "${{ inputs.mirrorchyan_rid }}" "${{ steps.information.outputs.version_name }}" "${{ inputs.os }}" "${{ inputs.arch }}" "${{ steps.information.outputs.channel }}" "${{ inputs.upload_token }}" "${{ steps.information.outputs.filename }}"
+
+        output=$(python mirrorchyan_uploading.py "${{ inputs.mirrorchyan_rid }}" "${{ steps.information.outputs.version_name }}" "${{ inputs.os }}" "${{ inputs.arch }}" "${{ steps.information.outputs.channel }}" "${{ inputs.upload_token }}" "${{ steps.information.outputs.filename }}"）
+        echo "output=$output" | tee -a "$GITHUB_OUTPUT"
 
     - name: Create issue if failed
       if: failure()
@@ -180,7 +172,7 @@ runs:
         title: "Failed to upload to MirrorChyan for ${{ github.repository }}"
         body: |
           ```json
-          ${{ steps.upload.outputs.response }}
+          ${{ steps.upload.outputs.output }}
           ```
 
           ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
