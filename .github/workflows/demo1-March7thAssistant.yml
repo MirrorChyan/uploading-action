@@ -1,0 +1,26 @@
+name: "demo1 for March7thAssistant"
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "action.yml"
+      - "python/**"
+      - ".github/workflows/demo1-March7thAssistant.yml"
+
+jobs:
+  mirrorchyan:
+    runs-on: macos-latest
+    steps:
+      - id: uploading
+        uses: MirrorChyan/uploading-action@v1
+        with:
+          filetype: latest-release
+          fileName: "March7thAssistant_*_full.zip"
+          mirrorchyan_rid: demo1
+
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+          owner: moesnow
+          repo: March7thAssistant
+          upload_token: ${{ secrets.MirrorChyanUploadTokenForDemo1 }}
