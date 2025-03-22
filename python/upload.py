@@ -8,7 +8,6 @@ urllib3.disable_warnings()
 
 _, rid, version, os, arch, channel, token, file = sys.argv
 
-
 data = {
     "name": version,
     "os": os,
@@ -26,7 +25,6 @@ print(data)
 
 
 def upload() -> bool:
-
     print(f"{datetime.now()} | start upload")
 
     # step 1
@@ -46,6 +44,7 @@ def upload() -> bool:
     # step 2
     response_1_data = response_1.json()["data"]
 
+    download_name = f"{rid}-{arch}-{os}-{version}.zip"
     response_2 = requests.post(
         response_1_data["host"],
         data={
@@ -55,6 +54,7 @@ def upload() -> bool:
             "key": response_1_data["key"],
             "policy": response_1_data["policy"],
             "OSSAccessKeyId": response_1_data["access_key"],
+            'Content-Disposition': f'attachment; filename="{download_name}"'
         },
         files={"file": open(file, "rb")},
         verify=False,
