@@ -44,7 +44,7 @@ def upload() -> bool:
     # step 2
     response_1_data = response_1.json()["data"]
 
-    download_name = f"{rid}-{arch}-{os}-{version}.zip"
+    download_name = f"{"-".join(filter(lambda x: x != "", [rid, os, arch, version]))}.zip"
     response_2 = requests.post(
         response_1_data["host"],
         data={
