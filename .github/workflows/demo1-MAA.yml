@@ -19,7 +19,7 @@ jobs:
         uses: MirrorChyan/uploading-action@v1
         with:
           filetype: latest-release
-          filename: "*MAA-*-win-${{ matrix.arch }}.zip"
+          filename: 'MAA-*-win-${{ matrix.arch }}.zip'
           mirrorchyan_rid: demo1
 
           github_token: ${{ secrets.GITHUB_TOKEN }}
