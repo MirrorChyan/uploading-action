@@ -109,7 +109,7 @@ runs:
             if [[ "${{ inputs.extra_zip }}" == true ]]; then
               cd downloads/
               zip -r "$filename".zip "$filename"
-              filename="downloads/$filename.zip"
+              filename="$filename.zip"
             fi
           else
             cd downloads/${{ inputs.working-directory }}
