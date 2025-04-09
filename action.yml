@@ -108,8 +108,9 @@ runs:
             filename=$(echo $downloaded_files | jq -r '.[0]')
             if [[ "${{ inputs.extra_zip }}" == true ]]; then
               cd downloads/
-              zip -r "$filename".zip "$filename"
-              filename="$filename.zip"
+              basename=$(basename ${filename})
+              zip -r "$basename".zip "$basename"
+              filename="downloads/$basename.zip"
             fi
           else
             cd downloads/${{ inputs.working-directory }}
