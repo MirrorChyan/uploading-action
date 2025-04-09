@@ -32,6 +32,9 @@ inputs:
     required: false
   repo:
     required: false
+  extra_zip:
+    default: "false"
+    required: false
 
   # for uploading
   mirrorchyan_rid:
@@ -103,6 +106,11 @@ runs:
           if [[ "${{ inputs.pick_files }}" == "" ]]; then
             downloaded_files='${{ steps.download-release.outputs.downloaded_files }}'
             filename=$(echo $downloaded_files | jq -r '.[0]')
+            if [[ "${{ inputs.extra_zip }}" == true ]]; then
+              cd downloads/
+              zip -r "$filename".zip "$filename"
+              filename="downloads/$filename.zip"
+            fi
           else
             cd downloads/${{ inputs.working-directory }}
             zip -r mirrorchyan.zip "${pick_files[@]}" -x "${exclude_files[@]}" .__Non-existent-placeholder__
