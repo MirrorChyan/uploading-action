@@ -6,7 +6,7 @@ on:
     paths:
       - "action.yml"
       - "python/**"
-      - ".github/workflows/demo1-MAA.yml
+      - ".github/workflows/demo1-MAA.yml"
 
 jobs:
   mirrorchyan:
