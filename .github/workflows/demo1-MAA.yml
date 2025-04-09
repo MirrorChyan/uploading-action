@@ -15,22 +15,7 @@ jobs:
       matrix:
         arch: [arm64, x64]
     steps:
-      - id: uploading
-        uses: MirrorChyan/uploading-action@v1
-        with:
-          filetype: latest-release
-          filename: "*MAA-*-win-${{ matrix.arch }}.zip"
-          mirrorchyan_rid: demo1
-
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-
-          owner: MaaAssistantArknights
-          repo: MaaAssistantArknights
-          upload_token: ${{ secrets.MirrorChyanUploadTokenForDemo1 }}
-          os: win
-          arch: ${{ matrix.arch }}
-
-      - id: uploading
+      - name: Upload MAA win
         uses: MirrorChyan/uploading-action@v1
         with:
           filetype: latest-release
