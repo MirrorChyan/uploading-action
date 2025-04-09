@@ -13,14 +13,13 @@ jobs:
     runs-on: macos-latest
     strategy:
       matrix:
-        os: [win]
         arch: [arm64, x64]
     steps:
       - id: uploading
         uses: MirrorChyan/uploading-action@v1
         with:
           filetype: latest-release
-          filename: "*MAA-*-${{ matrix.os }}-${{ matrix.arch }}.zip"
+          filename: "*MAA-*-win-${{ matrix.arch }}.zip"
           mirrorchyan_rid: demo1
 
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -28,5 +27,37 @@ jobs:
           owner: MaaAssistantArknights
           repo: MaaAssistantArknights
           upload_token: ${{ secrets.MirrorChyanUploadTokenForDemo1 }}
-          os: ${{ matrix.os }}
+          os: win
+          arch: ${{ matrix.arch }}
+
+      - id: uploading
+        uses: MirrorChyan/uploading-action@v1
+        with:
+          filetype: latest-release
+          filename: "*MAA-*-win-${{ matrix.arch }}.zip"
+          mirrorchyan_rid: demo1
+
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+
+          owner: MaaAssistantArknights
+          repo: MaaAssistantArknights
+          upload_token: ${{ secrets.MirrorChyanUploadTokenForDemo1 }}
+          os: win
+          arch: ${{ matrix.arch }}
+
+      - name: Upload MAA macos
+        uses: MirrorChyan/uploading-action@v1
+        if: always()
+        with:
+          filetype: latest-release
+          filename: "MAA-*-macos-universal.dmg"
+          extra_zip: true
+          mirrorchyan_rid: demo1
+
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          
+          owner: ${{ github.repository_owner }}
+          repo: ${{ github.event.repository.name }}
+          upload_token: ${{ secrets.MirrorChyanUploadTokenForDemo1 }}
+          os: macos
           arch: ${{ matrix.arch }}
