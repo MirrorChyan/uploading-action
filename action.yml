@@ -83,7 +83,7 @@ runs:
         fileName: ${{ inputs.filename }}
         tag: ${{ steps.latest-release.outputs.release }}
         out-file-path: "downloads"
-        extract: ${{ inputs.pick_files != '' }} || ${{ inputs.all_files == true }}
+        extract: ${{ inputs.pick_files != '' || inputs.all_files == 'true' }}
         token: ${{ inputs.github_token }}
 
     - name: Organize information
