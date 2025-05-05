@@ -115,11 +115,10 @@ runs:
             filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
           elif [[ "${{ inputs.p7zip }}" == true ]]; then
             cd downloads/${{ inputs.working-directory }}
-            brew install p7zip
             7z x ${filename} -oun7z
             cd un7z
             zip -r mirrorchyan.zip `ls` -x "${exclude_files[@]}" .__Non-existent-placeholder__
-            filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
+            filename="downloads/${{ inputs.working-directory }}un7z/mirrorchyan.zip"
           else
             if [[ "${{ inputs.extra_zip }}" == true ]]; then
               cd downloads/
