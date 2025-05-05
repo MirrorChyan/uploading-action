@@ -16,6 +16,10 @@ inputs:
   pick_files:
     description: pick some files to zip
     required: false
+  all_files:
+    default: "false"
+    required: false
+
   exclude_files:
     required: false
   working-directory:
@@ -103,7 +107,15 @@ runs:
 
         if [[ "${{ inputs.filetype }}" == "latest-release" ]]; then
           version_name='${{ steps.latest-release.outputs.release }}'
-          if [[ "${{ inputs.pick_files }}" == "" ]]; then
+          if [[ "${{ inputs.pick_files }}" != "" ]]; then
+            cd downloads/${{ inputs.working-directory }}
+            zip -r mirrorchyan.zip "${pick_files[@]}" -x "${exclude_files[@]}" .__Non-existent-placeholder__
+            filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
+          elif [[ "${{ inputs.all_files }}" == true ]]; then
+            cd downloads/${{ inputs.working-directory }}
+            zip -r mirrorchyan.zip `ls` -x "${exclude_files[@]}" .__Non-existent-placeholder__
+            filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
+          else
             downloaded_files='${{ steps.download-release.outputs.downloaded_files }}'
             filename=$(echo $downloaded_files | jq -r '.[0]')
             if [[ "${{ inputs.extra_zip }}" == true ]]; then
@@ -112,16 +124,10 @@ runs:
               zip -r "$basename".zip "$basename"
               filename="downloads/$basename.zip"
             fi
-          else
-            cd downloads/${{ inputs.working-directory }}
-            zip -r mirrorchyan.zip "${pick_files[@]}" -x "${exclude_files[@]}" .__Non-existent-placeholder__
-            filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
           fi
         elif [[ "${{ inputs.filetype }}" == "local" ]]; then
           version_name="${{ inputs.version_name }}"
-          if [[ "${{ inputs.pick_files }}" == "" ]]; then
-            filename="${{ inputs.filename }}"
-          else
+          if [[ "${{ inputs.pick_files }}" != "" ]]; then
             if [[ "${{ inputs.filename }}" != "" ]]; then
               unzip_dir="MirrorChyanUnzip/"
               unzip -d $unzip_dir "${{ inputs.filename }}"
@@ -132,6 +138,8 @@ runs:
             fi
             zip -r mirrorchyan.zip "${pick_files[@]}" -x "${exclude_files[@]}" .__Non-existent-placeholder__
             filename=$unzip_dir"${{ inputs.working-directory }}mirrorchyan.zip"
+          else
+            filename="${{ inputs.filename }}"
           fi
         else
           echo "Unknown filetype: ""${{ inputs.filetype }}"
