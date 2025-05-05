@@ -16,7 +16,7 @@ inputs:
   pick_files:
     description: pick some files to zip
     required: false
-  7z_to_zip:
+  sz_to_zip:
     default: "false"
     required: false
 
@@ -113,7 +113,7 @@ runs:
             cd downloads/${{ inputs.working-directory }}
             zip -r mirrorchyan.zip "${pick_files[@]}" -x "${exclude_files[@]}" .__Non-existent-placeholder__
             filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
-          elif [[ "${{ inputs.7z_to_zip }}" == true ]]; then
+          elif [[ "${{ inputs.sz_to_zip }}" == true ]]; then
             cd downloads/${{ inputs.working-directory }}
             brew install -y p7zip
             7z x ${filename} -oun7z
