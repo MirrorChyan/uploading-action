@@ -111,12 +111,14 @@ runs:
           filename=$(echo $downloaded_files | jq -r '.[0]')
           if [[ "${{ inputs.pick_files }}" != "" ]]; then
             cd downloads/${{ inputs.working-directory }}
-            if [[ "${{ inputs.7z_to_zip }}" == true ]]; then
-              brew install -y p7zip
-              7z x ${filename} -oun7z
-              cd un7z
-            fi
             zip -r mirrorchyan.zip "${pick_files[@]}" -x "${exclude_files[@]}" .__Non-existent-placeholder__
+            filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
+          elif [[ "${{ inputs.7z_to_zip }}" == true ]]; then
+            cd downloads/${{ inputs.working-directory }}
+            brew install -y p7zip
+            7z x ${filename} -oun7z
+            cd un7z
+            zip -r mirrorchyan.zip `ls` -x "${exclude_files[@]}" .__Non-existent-placeholder__
             filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
           else
             if [[ "${{ inputs.extra_zip }}" == true ]]; then
