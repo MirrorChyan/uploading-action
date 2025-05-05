@@ -142,6 +142,14 @@ runs:
             filename=$unzip_dir"${{ inputs.working-directory }}mirrorchyan.zip"
           else
             filename="${{ inputs.filename }}"
+            if [[ "${{ inputs.extra_zip }}" == true ]]; then
+              if [[ "${{ inputs.working-directory }}" != "" ]]; then
+                cd ${{ inputs.working-directory }}
+              fi
+              basename=$(basename ${filename})
+              zip -r "$basename".zip "$basename"
+              filename="${{ inputs.working-directory }}$basename.zip"
+            fi
           fi
         else
           echo "Unknown filetype: ""${{ inputs.filetype }}"
