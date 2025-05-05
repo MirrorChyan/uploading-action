@@ -16,7 +16,7 @@ inputs:
   pick_files:
     description: pick some files to zip
     required: false
-  all_files:
+  7z_to_zip:
     default: "false"
     required: false
 
@@ -83,7 +83,7 @@ runs:
         fileName: ${{ inputs.filename }}
         tag: ${{ steps.latest-release.outputs.release }}
         out-file-path: "downloads"
-        extract: ${{ inputs.pick_files != '' || inputs.all_files == 'true' }}
+        extract: ${{ inputs.pick_files != '' }}
         token: ${{ inputs.github_token }}
 
     - name: Organize information
@@ -107,17 +107,18 @@ runs:
 
         if [[ "${{ inputs.filetype }}" == "latest-release" ]]; then
           version_name='${{ steps.latest-release.outputs.release }}'
+          downloaded_files='${{ steps.download-release.outputs.downloaded_files }}'
+          filename=$(echo $downloaded_files | jq -r '.[0]')
           if [[ "${{ inputs.pick_files }}" != "" ]]; then
             cd downloads/${{ inputs.working-directory }}
+            if [[ "${{ inputs.7z_to_zip }}" == true ]]; then
+              brew install -y p7zip
+              7z x ${filename} -oun7z
+              cd un7z
+            fi
             zip -r mirrorchyan.zip "${pick_files[@]}" -x "${exclude_files[@]}" .__Non-existent-placeholder__
             filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
-          elif [[ "${{ inputs.all_files }}" == true ]]; then
-            cd downloads/${{ inputs.working-directory }}
-            zip -r mirrorchyan.zip `ls` -x "${exclude_files[@]}" .__Non-existent-placeholder__
-            filename="downloads/${{ inputs.working-directory }}mirrorchyan.zip"
           else
-            downloaded_files='${{ steps.download-release.outputs.downloaded_files }}'
-            filename=$(echo $downloaded_files | jq -r '.[0]')
             if [[ "${{ inputs.extra_zip }}" == true ]]; then
               cd downloads/
               basename=$(basename ${filename})
