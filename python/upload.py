@@ -1,4 +1,4 @@
-import os
+import os as pos
 import sys
 import time
 import urllib3
@@ -16,7 +16,7 @@ data = {
     "channel": channel,
 }
 
-if os.path.splitext(file)[1] != ".zip":
+if pos.path.splitext(file)[1] != ".zip":
     data["filename"] = os.path.split(file)[1]
 
 headers = {
