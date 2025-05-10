@@ -16,7 +16,8 @@ data = {
     "channel": channel,
 }
 
-if ospkg.path.splitext(file)[1] != ".zip":
+file_ext = ospkg.path.splitext(file)[1]
+if file_ext != ".zip":
     data["filename"] = ospkg.path.split(file)[1]
 
 headers = {
@@ -48,7 +49,7 @@ def upload() -> bool:
     # step 2
     response_1_data = response_1.json()["data"]
 
-    download_name = f"{"-".join(filter(lambda x: x != "", [rid, os, arch, version]))}.zip"
+    download_name = f"{"-".join(filter(lambda x: x != "", [rid, os, arch, version]))}.{file_ext}"
     response_2 = requests.post(
         response_1_data["host"],
         data={
