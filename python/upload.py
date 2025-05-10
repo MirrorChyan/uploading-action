@@ -1,4 +1,4 @@
-import os as pos
+import os as ospkg
 import sys
 import time
 import urllib3
@@ -16,8 +16,8 @@ data = {
     "channel": channel,
 }
 
-if pos.path.splitext(file)[1] != ".zip":
-    data["filename"] = pos.path.split(file)[1]
+if ospkg.path.splitext(file)[1] != ".zip":
+    data["filename"] = ospkg.path.split(file)[1]
 
 headers = {
     "Authorization": token,
