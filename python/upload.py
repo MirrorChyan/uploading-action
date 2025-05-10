@@ -17,7 +17,7 @@ data = {
 }
 
 file_ext = ospkg.path.splitext(file)[1]
-download_name = f"{"-".join(filter(lambda x: x != "", [rid, os, arch, version]))}.{file_ext}"
+download_name = f"{"-".join(filter(lambda x: x != "", [rid, os, arch, version]))}{file_ext}"
 
 if file_ext != ".zip":
     data["filename"] = download_name
