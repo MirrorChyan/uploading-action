@@ -17,7 +17,7 @@ data = {
 }
 
 if pos.path.splitext(file)[1] != ".zip":
-    data["filename"] = os.path.split(file)[1]
+    data["filename"] = pos.path.split(file)[1]
 
 headers = {
     "Authorization": token,
