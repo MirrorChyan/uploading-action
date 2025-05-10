@@ -1,3 +1,4 @@
+import os
 import sys
 import time
 import urllib3
@@ -14,6 +15,9 @@ data = {
     "arch": arch,
     "channel": channel,
 }
+
+if os.path.splitext(file)[1] != ".zip":
+    data["filename"] = os.path.split(file)[1]
 
 headers = {
     "Authorization": token,
