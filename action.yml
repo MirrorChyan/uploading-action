@@ -39,6 +39,9 @@ inputs:
   extra_zip:
     default: "false"
     required: false
+  tag:
+    default: ""
+    required: false
 
   # for uploading
   mirrorchyan_rid:
@@ -68,7 +71,7 @@ runs:
   using: "composite"
   steps:
     - id: latest-release
-      if: ${{ inputs.filetype == 'latest-release' }}
+      if: ${{ inputs.filetype == 'latest-release' && inputs.tag == '' }}
       uses: pozetroninc/github-action-get-latest-release@master
       with:
         owner: ${{ inputs.owner }}
@@ -81,7 +84,7 @@ runs:
       with:
         repository: ${{ inputs.owner }}/${{ inputs.repo }}
         fileName: ${{ inputs.filename }}
-        tag: ${{ steps.latest-release.outputs.release }}
+        tag: ${{ inputs.tag || steps.latest-release.outputs.release }}
         out-file-path: "downloads"
         extract: ${{ inputs.pick_files != '' }}
         token: ${{ inputs.github_token }}
@@ -106,7 +109,7 @@ runs:
         fi
 
         if [[ "${{ inputs.filetype }}" == "latest-release" ]]; then
-          version_name='${{ steps.latest-release.outputs.release }}'
+          version_name='${{ inputs.tag || steps.latest-release.outputs.release }}'
           downloaded_files='${{ steps.download-release.outputs.downloaded_files }}'
           filename=$(echo $downloaded_files | jq -r '.[0]')
           if [[ "${{ inputs.pick_files }}" != "" ]]; then
