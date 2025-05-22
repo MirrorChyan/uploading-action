@@ -156,7 +156,7 @@ runs:
           exit 1
         fi
 
-        if [[ ${{ inputs.auto_channel }} != false ]]; then
+        if [[ "${{ inputs.channel }}" == "" ]]; then
           if [[ "$version_name" == *"alpha"* ]]; then
             channel="alpha"
           elif [[ "$version_name" == *"beta"* ]]; then
