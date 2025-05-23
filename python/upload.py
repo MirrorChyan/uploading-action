@@ -101,12 +101,10 @@ def main():
         if upload(rid, file, data, headers, download_name):
             done = True
             break
-        elif i == retries - 1:
-            break
-        else:
-            sleep_time = 30
-            log(f"retry {i + 1} after {sleep_time}s")
-            time.sleep(sleep_time)
+        elif i + 1 < retries:
+            delay = (i + 1) * 15
+            log(f"retry {i + 1} after {delay}s")
+            time.sleep(delay)
 
     if not done:
         log("failed")
