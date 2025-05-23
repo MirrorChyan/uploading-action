@@ -29,11 +29,14 @@ headers = {
     "Accept": "*/*",
     "Content-Type": "application/x-www-form-urlencoded",
 }
-print(data)
+
+
+def log(msg: object) -> None:
+    print(f"{datetime.now()} | {msg}")
 
 
 def upload() -> bool:
-    print(f"{datetime.now()} | start upload")
+    log("start upload")
 
     # step 1
 
@@ -43,10 +46,10 @@ def upload() -> bool:
         data=data,
         verify=False,
     )
-    print(f"{datetime.now()} | step 1: {response_1.status_code}")
+    log(f"step 1: {response_1.status_code}")
 
     if response_1.status_code != 200:
-        print(f"step 1 failed: {response_1.status_code}, {response_1.text}")
+        log(f"step 1 failed: {response_1.status_code}, {response_1.text}")
         return False
 
     # step 2
@@ -67,10 +70,10 @@ def upload() -> bool:
         verify=False,
     )
 
-    print(f"{datetime.now()} | step 2: {response_2.status_code}")
+    log(f"step 2: {response_2.status_code}")
 
     if response_2.status_code != 200:
-        print(f"step 2 failed: {response_2.status_code}, {response_2.text}")
+        log(f"step 2 failed: {response_2.status_code}, {response_2.text}")
         return False
 
     # step 3
@@ -83,17 +86,19 @@ def upload() -> bool:
         verify=False,
     )
 
-    print(f"{datetime.now()} | step 3: {response_3.status_code}")
+    log(f"step 3: {response_3.status_code}")
 
     if response_3.status_code != 200:
-        print(f"step 3 failed: {response_3.status_code}, {response_3.text}")
+        log(f"step 3 failed: {response_3.status_code}, {response_3.text}")
         return False
 
-    print(f"{datetime.now()} | uploaded")
+    log("uploaded")
     return True
 
 
 if __name__ == "__main__":
+    log(data)
+
     done = False
     retires = 3
     for i in range(retires):
@@ -104,11 +109,11 @@ if __name__ == "__main__":
             break
         else:
             sleep_time = 30
-            print(f"{datetime.now()} | retry {i + 1} after {sleep_time}s")
+            log(f"retry {i + 1} after {sleep_time}s")
             time.sleep(sleep_time)
 
     if not done:
-        print(f"{datetime.now()} | failed")
+        log("failed")
         exit(1)
 
-    print(f"{datetime.now()} | done")
+    log("done")
