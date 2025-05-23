@@ -16,7 +16,6 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
     log("start upload")
 
     # step 1
-
     response_1 = requests.post(
         f"https://mirrorchyan.com/api/resources/{rid}/versions",
         headers=headers,
@@ -41,12 +40,11 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
             "key": response_1_data["key"],
             "policy": response_1_data["policy"],
             "OSSAccessKeyId": response_1_data["access_key"],
-            'Content-Disposition': f'attachment; filename="{download_name}"'
+            "Content-Disposition": f'attachment; filename="{download_name}"',
         },
         files={"file": open(file, "rb")},
         verify=False,
     )
-
     log(f"step 2: {response_2.status_code}")
 
     if response_2.status_code != 200:
@@ -62,7 +60,6 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
         data=data,
         verify=False,
     )
-
     log(f"step 3: {response_3.status_code}")
 
     if response_3.status_code != 200:
@@ -99,12 +96,12 @@ def main():
     log(data)
 
     done = False
-    retires = 3
-    for i in range(retires):
+    retries = 3
+    for i in range(retries):
         if upload(rid, file, data, headers, download_name):
             done = True
             break
-        elif i == retires - 1:
+        elif i == retries - 1:
             break
         else:
             sleep_time = 30
