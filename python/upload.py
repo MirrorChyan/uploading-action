@@ -7,35 +7,12 @@ from datetime import datetime
 
 urllib3.disable_warnings()
 
-_, rid, version, os, arch, channel, token, file = sys.argv
-
-data = {
-    "name": version,
-    "os": os,
-    "arch": arch,
-    "channel": channel,
-}
-
-file_ext = ospkg.path.splitext(file)[1]
-download_name = f"{"-".join(filter(lambda x: x != "", [rid, os, arch, version]))}{file_ext}"
-
-if file_ext != ".zip":
-    data["filename"] = download_name
-
-
-headers = {
-    "Authorization": token,
-    "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
-    "Accept": "*/*",
-    "Content-Type": "application/x-www-form-urlencoded",
-}
-
 
 def log(msg: object) -> None:
     print(f"{datetime.now()} | {msg}")
 
 
-def upload() -> bool:
+def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -> bool:
     log("start upload")
 
     # step 1
@@ -96,13 +73,35 @@ def upload() -> bool:
     return True
 
 
-if __name__ == "__main__":
+def main():
+    _, rid, version, os, arch, channel, token, file = sys.argv
+
+    data = {
+        "name": version,
+        "os": os,
+        "arch": arch,
+        "channel": channel,
+    }
+
+    file_ext = ospkg.path.splitext(file)[1]
+    download_name = f"{"-".join(filter(lambda x: x != "", [rid, os, arch, version]))}{file_ext}"
+
+    if file_ext != ".zip":
+        data["filename"] = download_name
+
+    headers = {
+        "Authorization": token,
+        "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
+        "Accept": "*/*",
+        "Content-Type": "application/x-www-form-urlencoded",
+    }
+
     log(data)
 
     done = False
     retires = 3
     for i in range(retires):
-        if upload():
+        if upload(rid, file, data, headers, download_name):
             done = True
             break
         elif i == retires - 1:
@@ -117,3 +116,7 @@ if __name__ == "__main__":
         exit(1)
 
     log("done")
+
+
+if __name__ == "__main__":
+    main()
