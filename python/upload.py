@@ -81,9 +81,9 @@ def main():
     }
 
     file_ext = ospkg.path.splitext(file)[1]
-    download_name = f"{"-".join(filter(lambda x: x != "", [rid, os, arch, version]))}{file_ext}"
+    download_name = "-".join(filter(bool, [rid, os, arch, version])) + file_ext
 
-    if file_ext != ".zip":
+    if file_ext.lower() != ".zip":
         data["filename"] = download_name
 
     headers = {
@@ -110,9 +110,10 @@ def main():
 
     if not done:
         log("failed")
-        exit(1)
+        sys.exit(1)
 
     log("done")
+    sys.exit(0)
 
 
 if __name__ == "__main__":
