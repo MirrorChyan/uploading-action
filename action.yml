@@ -74,15 +74,15 @@ runs:
       if: ${{ inputs.filetype == 'latest-release' && inputs.tag == '' }}
       uses: pozetroninc/github-action-get-latest-release@master
       with:
-        owner: ${{ inputs.owner }}
-        repo: ${{ inputs.repo }}
+        owner: ${{ inputs.owner || github.repository_owner }}
+        repo: ${{ inputs.repo || github.event.repository.name }}
         token: ${{ inputs.github_token }}
 
     - id: download-release
       if: ${{ inputs.filetype == 'latest-release' }}
       uses: robinraju/release-downloader@v1
       with:
-        repository: ${{ inputs.owner }}/${{ inputs.repo }}
+        repository: ${{ inputs.owner || github.repository_owner }}/${{ inputs.repo || github.event.repository.name }}
         fileName: ${{ inputs.filename }}
         tag: ${{ inputs.tag || steps.latest-release.outputs.release }}
         out-file-path: "downloads"
