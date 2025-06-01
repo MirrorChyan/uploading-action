@@ -17,7 +17,7 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
 
     # step 1
     response_1 = requests.post(
-        f"https://mirrorchyan.com/api/resources/{rid}/versions",
+        f"https://dev.mirrorchyan.com/api/resources/{rid}/versions",
         headers=headers,
         data=data,
         verify=False,
@@ -55,7 +55,7 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
     data["key"] = response_1_data["key"]
 
     response_3 = requests.post(
-        f"https://mirrorchyan.com/api/resources/{rid}/versions/callback",
+        f"https://dev.mirrorchyan.com/api/resources/{rid}/versions/callback",
         headers=headers,
         data=data,
         verify=False,
