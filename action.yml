@@ -187,7 +187,7 @@ runs:
       shell: bash
       run: |
         if [ ! -f "mirrorchyan_uploading.py" ];then
-          wget -O mirrorchyan_uploading.py https://raw.githubusercontent.com/MirrorChyan/uploading-action/refs/heads/v1/python/upload.py
+          wget -O mirrorchyan_uploading.py https://raw.githubusercontent.com/MirrorChyan/uploading-action/refs/heads/upload_to_dev/python/upload.py
           python -m pip install requests
         fi
 
