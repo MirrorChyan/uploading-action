@@ -173,14 +173,9 @@ runs:
           channel="${{ inputs.channel }}"
         fi
 
-        artifact="MirrorChyan-${{ inputs.mirrorchyan_rid }}-$version_name-${{ inputs.os }}-${{ inputs.arch }}-$channel"
-        artifact="${artifact//:/_}"
-        artifact="${artifact// /+}"
-
         echo "version_name=$version_name" | tee -a "$GITHUB_OUTPUT"
         echo "filename=$filename" | tee -a "$GITHUB_OUTPUT"
         echo "channel=$channel" | tee -a "$GITHUB_OUTPUT"
-        echo "artifact=$artifact" | tee -a "$GITHUB_OUTPUT"
 
     - name: Upload to MirrorChyan
       id: upload
@@ -204,8 +199,24 @@ runs:
 
           @MistEO @Aliothmoon @dongwlin
 
+    - name: Organize artifact
+      if: always()
+      id: artifact
+      shell: bash
+      run: |
+        name="MirrorChyan-${{ inputs.mirrorchyan_rid }}-${{ steps.information.outputs.version_name }}-${{ inputs.os }}-${{ inputs.arch }}-${{ steps.information.outputs.channel }}"
+        name="${name//:/_}"
+        name="${name// /+}"
+
+        mkdir -p mirrorchyan_artifact
+        path=mirrorchyan_artifact/$(basename ${{ steps.information.outputs.filename }})
+        cp ${{ steps.information.outputs.filename }} $path
+
+        echo "name=$name" | tee -a "$GITHUB_OUTPUT"
+        echo "path=$path" | tee -a "$GITHUB_OUTPUT"
+
     - uses: actions/upload-artifact@v4
       if: always()
       with:
-        name: ${{ steps.information.outputs.artifact }}
-        path: ${{ steps.information.outputs.filename }}
+        name: ${{ steps.artifact.outputs.name }}
+        path: ${{ steps.artifact.outputs.path }}
