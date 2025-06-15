@@ -87,7 +87,7 @@ def main():
         data["filename"] = download_name
 
     headers = {
-        "Authorization": token,
+        "Authorization": token.strip(),
         "User-Agent": "Apifox/1.0.0 (https://apifox.com)",
         "Accept": "*/*",
         "Content-Type": "application/x-www-form-urlencoded",
