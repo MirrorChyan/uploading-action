@@ -12,6 +12,12 @@ def log(msg: object) -> None:
     print(f"{datetime.now()} | {msg}")
 
 
+def get_suffix(path):
+    if path.endswith('.tar.gz'):
+        return '.tar.gz'
+    return ospkg.path.splitext(path)[1]
+
+
 def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -> bool:
     log("start upload")
 
@@ -80,11 +86,10 @@ def main():
         "channel": channel,
     }
 
-    file_ext = ospkg.path.splitext(file)[1]
+    file_ext = get_suffix(file)
     download_name = "-".join(filter(bool, [rid, os, arch, version])) + file_ext
 
-    if file_ext.lower() != ".zip":
-        data["filename"] = download_name
+    data["filename"] = download_name
 
     headers = {
         "Authorization": token.strip(),
