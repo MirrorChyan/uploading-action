@@ -219,7 +219,7 @@ runs:
       if: failure()
       shell: bash
       run: |
-          curl -X POST 'http://dev.mirrorchyan.com/api/misc/notify_admin' \
+          curl -X POST 'https://dev.mirrorchyan.com/api/misc/notify_admin' \
             --header 'Content-Type: application/json' \
             --header 'Authorization: ${{ inputs.upload_token }}' \
             --data '{"rid":"${{ inputs.mirrorchyan_rid }}", "url":"${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"}' 
