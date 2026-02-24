@@ -7,6 +7,7 @@ from datetime import datetime
 
 urllib3.disable_warnings()
 
+BASE = "mirrorchyan.com"
 
 def log(msg: object) -> None:
     print(f"{datetime.now()} | {msg}")
@@ -23,7 +24,7 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
 
     # step 1
     response_1 = requests.post(
-        f"https://mirrorchyan.com/api/resources/{rid}/versions",
+        f"https://{BASE}/api/resources/{rid}/versions",
         headers=headers,
         data=data,
         verify=False,
@@ -61,7 +62,7 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
     data["key"] = response_1_data["key"]
 
     response_3 = requests.post(
-        f"https://mirrorchyan.com/api/resources/{rid}/versions/callback",
+        f"https://{BASE}/api/resources/{rid}/versions/callback",
         headers=headers,
         data=data,
         verify=False,
@@ -90,7 +91,7 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
     for i in range(max_polls):
         time.sleep(interval)
         resp = requests.get(
-            f"https://mirrorchyan.com/api/resources/{rid}/versions/status",
+            f"https://{BASE}/api/resources/{rid}/versions/status",
             headers=poll_headers,
             params={"key": status_key},
             verify=False,
