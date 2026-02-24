@@ -7,6 +7,7 @@ from datetime import datetime
 
 urllib3.disable_warnings()
 
+BASE = "mirrorchyan.com"
 
 def log(msg: object) -> None:
     print(f"{datetime.now()} | {msg}")
@@ -23,7 +24,7 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
 
     # step 1
     response_1 = requests.post(
-        f"https://mirrorchyan.com/api/resources/{rid}/versions",
+        f"https://{BASE}/api/resources/{rid}/versions",
         headers=headers,
         data=data,
         verify=False,
@@ -61,7 +62,7 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
     data["key"] = response_1_data["key"]
 
     response_3 = requests.post(
-        f"https://mirrorchyan.com/api/resources/{rid}/versions/callback",
+        f"https://{BASE}/api/resources/{rid}/versions/callback",
         headers=headers,
         data=data,
         verify=False,
@@ -72,8 +73,49 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
         log(f"step 3 failed: {response_3.status_code}, {response_3.text}")
         return False
 
-    log("uploaded")
-    return True
+    status_key = response_3.json()["data"].get("status_key", "")
+    if not status_key:
+        log("no status_key returned, skip polling")
+        return True
+
+    # step 4: poll status
+    log(f"polling status with key: {status_key}")
+    poll_headers = {k: v for k, v in headers.items() if k != "Content-Type"}
+
+    STATUS_PENDING = 1
+    STATUS_COMPLETED = 2
+    STATUS_FAILED = 3
+
+    max_polls = 60
+    interval = 5
+    for i in range(max_polls):
+        time.sleep(interval)
+        resp = requests.get(
+            f"https://{BASE}/api/resources/{rid}/versions/status",
+            headers=poll_headers,
+            params={"key": status_key},
+            verify=False,
+        )
+        if resp.status_code != 200:
+            log(f"poll failed: {resp.status_code}, {resp.text}")
+            continue
+
+        status = resp.json()["data"]["status"]
+        if status == STATUS_COMPLETED:
+            log("processing completed")
+            return True
+        elif status == STATUS_FAILED:
+            log("processing failed on server")
+            return False
+        elif status != STATUS_PENDING:
+            log(f"unexpected status: {status}")
+            return False
+
+        if (i + 1) % 6 == 0:
+            log(f"still pending... ({(i + 1) * interval}s elapsed)")
+
+    log("polling timed out")
+    return False
 
 
 def main():
