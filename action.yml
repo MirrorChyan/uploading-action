@@ -70,6 +70,17 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Check upload token
+      id: check-token
+      shell: bash
+      env:
+        UPLOAD_TOKEN: ${{ inputs.upload_token }}
+      run: |
+        if [[ -z "$UPLOAD_TOKEN" ]]; then
+          echo "::error::upload_token is required but was not provided"
+          exit 1
+        fi
+
     - id: latest-release
       if: ${{ inputs.filetype == 'latest-release' && inputs.tag == '' }}
       uses: pozetroninc/github-action-get-latest-release@master
@@ -190,7 +201,7 @@ runs:
         python mirrorchyan_uploading.py '${{ inputs.mirrorchyan_rid }}' '${{ steps.information.outputs.version_name }}' '${{ inputs.os }}' '${{ inputs.arch }}' '${{ steps.information.outputs.channel }}' '${{ inputs.upload_token }}' '${{ steps.information.outputs.filename }}'
 
     - name: Create issue if failed
-      if: failure()
+      if: failure() && steps.check-token.outcome == 'success'
       uses: actions-cool/issues-helper@v3
       with:
         actions: "create-issue"
@@ -217,7 +228,7 @@ runs:
         echo "path=$path" | tee -a "$GITHUB_OUTPUT"
 
     - name: Notify admin if failed
-      if: failure()
+      if: failure() && steps.check-token.outcome == 'success'
       shell: bash
       run: |
           curl -L -X POST 'https://dev.mirrorchyan.com/api/misc/notify_admin?dev=1' \
