@@ -202,14 +202,18 @@ runs:
 
     - name: Create issue if failed
       if: failure() && steps.check-token.outcome == 'success'
-      uses: actions-cool/issues-helper@v3
-      with:
-        actions: "create-issue"
-        title: "Failed to upload to MirrorChyan for ${{ github.repository }}"
-        body: |
+      shell: bash
+      env:
+        GH_TOKEN: ${{ github.token }}
+        ISSUE_BODY: |
           ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-          @MistEO @Aliothmoon 
+          @MistEO @Aliothmoon
+      run: |
+        gh issue create \
+          --repo "${{ github.repository }}" \
+          --title "Failed to upload to MirrorChyan for ${{ github.repository }}" \
+          --body "$ISSUE_BODY"
 
     - name: Organize artifact
       if: always()
