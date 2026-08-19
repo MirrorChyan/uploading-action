@@ -9,6 +9,7 @@ urllib3.disable_warnings()
 
 BASE = "mirrorchyan.com"
 
+
 def log(msg: object) -> None:
     print(f"{datetime.now()} | {msg}")
 
@@ -129,7 +130,7 @@ def main():
     }
 
     file_ext = get_suffix(file)
-    download_name = "-".join(filter(bool, [rid, os, arch, version])) + file_ext
+    download_name = "-".join(filter(bool, [rid, version, os, arch])) + file_ext
 
     data["filename"] = download_name
 
