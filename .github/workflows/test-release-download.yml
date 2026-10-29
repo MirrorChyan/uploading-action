@@ -1,0 +1,62 @@
+name: Test release download
+
+on:
+  push:
+    paths:
+      - action.yml
+      - .github/workflows/test-release-download.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  download:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: unicode-tag
+            tag: v2026.1020.23431.杂鱼
+          - name: latest-release
+            tag: ''
+    name: ${{ matrix.name }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./
+        with:
+          filetype: latest-release
+          filename: 'Sunshine*Installer*.exe'
+          tag: ${{ matrix.tag }}
+          owner: AlkaidLab
+          repo: foundation-sunshine
+          mirrorchyan_rid: foundation-sunshine
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          upload_token: test-only
+          fake_upload: 'true'
+          os: win
+          arch: x64
+      - name: Verify installer checksum
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ matrix.tag }}
+        run: |
+          tag="$RELEASE_TAG"
+          if [[ -z "$tag" ]]; then
+            tag="$(gh release list --repo AlkaidLab/foundation-sunshine --limit 1 --json tagName --jq '.[0].tagName')"
+          fi
+          gh release view "$tag" --repo AlkaidLab/foundation-sunshine --json assets > release.json
+          files=(downloads/*.exe)
+          if [[ ${#files[@]} -ne 1 || ! -f "${files[0]}" ]]; then
+            echo "Expected exactly one installer EXE" >&2
+            exit 1
+          fi
+          name="$(basename "${files[0]}")"
+          expected="$(jq -r --arg name "$name" '.assets[] | select(.name == $name) | .digest' release.json)"
+          if [[ "$expected" != sha256:* ]]; then
+            echo "Missing installer SHA256 digest" >&2
+            exit 1
+          fi
+          printf '%s  %s\n' "${expected#sha256:}" "${files[0]}" | sha256sum --check

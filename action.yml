@@ -72,6 +72,7 @@ runs:
   steps:
     - name: Check upload token
       id: check-token
+      if: ${{ inputs.fake_upload != 'true' }}
       shell: bash
       env:
         UPLOAD_TOKEN: ${{ inputs.upload_token }}
@@ -82,12 +83,13 @@ runs:
         fi
 
     - id: latest-release
-      if: ${{ inputs.filetype == 'latest-release' && inputs.tag == '' }}
-      uses: pozetroninc/github-action-get-latest-release@master
+      if: ${{ inputs.filetype == 'latest-release' }}
+      uses: MirrorChyan/github-action-get-latest-release@master
       with:
         owner: ${{ inputs.owner || github.repository_owner }}
         repo: ${{ inputs.repo || github.event.repository.name }}
         token: ${{ inputs.github_token }}
+        tag: ${{ inputs.tag }}
         excludes: "draft"
 
     - id: download-release
@@ -96,7 +98,7 @@ runs:
       with:
         repository: ${{ inputs.owner || github.repository_owner }}/${{ inputs.repo || github.event.repository.name }}
         fileName: ${{ inputs.filename }}
-        tag: ${{ inputs.tag || steps.latest-release.outputs.release }}
+        releaseId: ${{ steps.latest-release.outputs.id }}
         out-file-path: "downloads"
         extract: ${{ inputs.pick_files != '' }}
         token: ${{ inputs.github_token }}
@@ -191,6 +193,7 @@ runs:
 
     - name: Upload to MirrorChyan
       id: upload
+      if: ${{ inputs.fake_upload != 'true' }}
       shell: bash
       run: |
         if [ ! -f "mirrorchyan_uploading.py" ];then
