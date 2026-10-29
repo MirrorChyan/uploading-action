@@ -72,6 +72,7 @@ runs:
   steps:
     - name: Check upload token
       id: check-token
+      if: ${{ inputs.fake_upload != 'true' }}
       shell: bash
       env:
         UPLOAD_TOKEN: ${{ inputs.upload_token }}
@@ -192,6 +193,7 @@ runs:
 
     - name: Upload to MirrorChyan
       id: upload
+      if: ${{ inputs.fake_upload != 'true' }}
       shell: bash
       run: |
         if [ ! -f "mirrorchyan_uploading.py" ];then
