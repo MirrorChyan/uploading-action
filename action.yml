@@ -211,7 +211,7 @@ runs:
         ISSUE_BODY: |
           ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
-          @MistEO @Aliothmoon
+          @MirrorChyanDesu @MistEO @Aliothmoon
       run: |
         gh issue create \
           --repo "${{ github.repository }}" \
