@@ -5,6 +5,14 @@ import urllib3
 import requests
 from datetime import datetime
 
+try:
+    from requests_toolbelt import MultipartEncoder
+except ModuleNotFoundError as error:
+    if error.name != "requests_toolbelt":
+        raise
+    # Older pinned actions download this script from v1 but install only requests.
+    MultipartEncoder = None
+
 urllib3.disable_warnings()
 
 BASE = "mirrorchyan.com"
@@ -39,9 +47,8 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
     # step 2
     response_1_data = response_1.json()["data"]
 
-    response_2 = requests.post(
-        response_1_data["host"],
-        data={
+    with open(file, "rb") as source:
+        fields = {
             "success_action_status": "200",
             "name": response_1_data["name"],
             "signature": response_1_data["signature"],
@@ -49,10 +56,31 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
             "policy": response_1_data["policy"],
             "OSSAccessKeyId": response_1_data["access_key"],
             "Content-Disposition": f'attachment; filename="{download_name}"',
-        },
-        files={"file": open(file, "rb")},
-        verify=False,
-    )
+        }
+        if MultipartEncoder is None:
+            log("requests-toolbelt is unavailable; using the legacy non-streaming upload")
+            # Requests sends this body in a single write. A short socket timeout
+            # here would cap the entire transfer even when it is making progress.
+            upload_args = {"data": fields, "files": {"file": source}}
+        else:
+            # Stream the multipart body instead of buffering the whole file in memory.
+            # OSS PostObject requires the file field to be last.
+            body = MultipartEncoder(fields={
+                **fields, "file": (ospkg.path.basename(file), source),
+            })
+            upload_args = {
+                "data": body,
+                "headers": {"Content-Type": body.content_type},
+                "timeout": (30, 300),
+                # A consumed multipart encoder cannot replay its body on a redirect.
+                "allow_redirects": False,
+            }
+        try:
+            response_2 = requests.post(response_1_data["host"], verify=False, **upload_args)
+        except (requests.Timeout, requests.ConnectionError) as error:
+            # Transport errors may contain the signed storage URL.
+            log(f"step 2 failed: {type(error).__name__}")
+            return False
     log(f"step 2: {response_2.status_code}")
 
     if response_2.status_code != 200:
