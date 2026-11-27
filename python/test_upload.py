@@ -82,6 +82,10 @@ class UploadTest(unittest.TestCase):
             if self.allow_buffering:
                 body = prepared.body
             else:
+                connect_timeout, read_timeout = kwargs["timeout"]
+                self.assertGreater(connect_timeout, 0)
+                self.assertGreater(read_timeout, 0)
+                self.assertIs(kwargs["allow_redirects"], False)
                 self.assertEqual(source.read_sizes, [], "File was buffered while preparing the request")
                 body = b"".join(iter(lambda: prepared.body.read(8192), b""))
             self.assertEqual(len(body), int(prepared.headers["Content-Length"]))
@@ -119,6 +123,7 @@ class UploadTest(unittest.TestCase):
             name = part.get_param("name", header="content-disposition")
             self.assertEqual(part.get_payload(decode=True).decode(), fields[name])
         self.assertEqual(parts[-1].get_filename(), self.path.name)
+        self.assertIsNone(parts[-1]["Content-Type"])
         self.assertEqual(parts[-1].get_payload(decode=True), self.payload)
         self.assertTrue(all(source.closed for source in self.opened))
         self.assertTrue(all(len(source.read_sizes) > 1 for source in self.opened))
@@ -136,22 +141,23 @@ class UploadTest(unittest.TestCase):
 
     def test_closes_file_and_skips_callback_on_transport_error(self):
         self.outcomes = [requests.ConnectionError("test connection failure")]
-        with self.assertRaises(requests.ConnectionError):
-            self.run_upload()
+        self.assertFalse(self.run_upload())
+        upload.log.assert_called_with("step 2 failed: ConnectionError")
         self.assertTrue(self.opened[0].closed)
         self.assertEqual(self.callbacks, 0)
 
     def test_retry_reopens_file_and_sends_complete_body(self):
-        self.outcomes = [503, 200]
+        self.outcomes = [503, requests.Timeout("private storage URL"), 200]
         with mock.patch.object(upload.sys, "argv", [
             "upload.py", "Example", "1.0", "linux", "x64", "stable", "test-token", str(self.path),
         ]), mock.patch.object(upload.time, "sleep"), self.assertRaises(SystemExit) as exit_result:
             upload.main()
         self.assertEqual(exit_result.exception.code, 0)
-        self.assertEqual(len(self.opened), 2)
+        self.assertEqual(len(self.opened), 3)
         self.assertEqual(self.callbacks, 1)
-        self.assert_complete_upload(self.messages[0], "Example-1.0-linux-x64.tar.gz")
-        self.assert_complete_upload(self.messages[1], "Example-1.0-linux-x64.tar.gz")
+        for parts in self.messages:
+            self.assert_complete_upload(parts, "Example-1.0-linux-x64.tar.gz")
+        upload.log.assert_any_call("step 2 failed: Timeout")
 
     def test_older_pinned_action_without_toolbelt_keeps_working(self):
         original_import = __import__
@@ -172,6 +178,7 @@ class UploadTest(unittest.TestCase):
                 "Example", str(self.path), self.data, self.headers, "download.tar.gz",
             ))
         self.assertEqual(self.messages[0][-1].get_payload(decode=True), self.payload)
+        self.assertIsNone(self.messages[0][-1]["Content-Type"])
         self.assertTrue(self.opened[0].closed)
         self.assertEqual(self.callbacks, 1)
 

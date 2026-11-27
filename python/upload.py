@@ -59,6 +59,8 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
         }
         if MultipartEncoder is None:
             log("requests-toolbelt is unavailable; using the legacy non-streaming upload")
+            # Requests sends this body in a single write. A short socket timeout
+            # here would cap the entire transfer even when it is making progress.
             upload_args = {"data": fields, "files": {"file": source}}
         else:
             # Stream the multipart body instead of buffering the whole file in memory.
@@ -66,12 +68,19 @@ def upload(rid: str, file: str, data: dict, headers: dict, download_name: str) -
             body = MultipartEncoder(fields={
                 **fields, "file": (ospkg.path.basename(file), source),
             })
-            upload_args = {"data": body, "headers": {"Content-Type": body.content_type}}
-        response_2 = requests.post(
-            response_1_data["host"],
-            verify=False,
-            **upload_args,
-        )
+            upload_args = {
+                "data": body,
+                "headers": {"Content-Type": body.content_type},
+                "timeout": (30, 300),
+                # A consumed multipart encoder cannot replay its body on a redirect.
+                "allow_redirects": False,
+            }
+        try:
+            response_2 = requests.post(response_1_data["host"], verify=False, **upload_args)
+        except (requests.Timeout, requests.ConnectionError) as error:
+            # Transport errors may contain the signed storage URL.
+            log(f"step 2 failed: {type(error).__name__}")
+            return False
     log(f"step 2: {response_2.status_code}")
 
     if response_2.status_code != 200:
